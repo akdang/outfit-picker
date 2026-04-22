@@ -393,6 +393,36 @@ const outfits: Outfit[] = [
       "Silver chain + rectangle + thin band + silver gauge",
     ],
   },
+  {
+    id: 26,
+    top: "Black short-sleeve button-up",
+    pants: "Charcoal chinos",
+    shoes: "Black boots",
+    signature: true,
+    occasion: "Tonal night",
+    mood: ["night", "stylish", "date"],
+    accessories: [
+      "Silver chain + rectangle ring + matte cuff + studs",
+      "Black chain + signet + thin band + studs",
+      "Shiny thin band (thumb) + thin hoop",
+      "Silver chain + rectangle + thin band + silver gauge",
+    ],
+  },
+  {
+    id: 27,
+    top: "Black short-sleeve button-up",
+    pants: "Light blue jeans",
+    shoes: "White sneakers",
+    signature: true,
+    occasion: "Casual hangout",
+    mood: ["casual", "day", "light"],
+    accessories: [
+      "Silver chain + rectangle ring + matte cuff + studs",
+      "Black chain + signet + thin band + studs",
+      "Shiny thin band (thumb) + thin hoop",
+      "Silver chain + rectangle + thin band + silver gauge",
+    ],
+  },    
 ];
 
 const inventory = {
@@ -407,6 +437,7 @@ const inventory = {
     "Sage green button-up",
     "Beige button-up",
     "Black button-up",
+    "Black short-sleeve button-up"
   ],
   pants: [
     "Black chinos",
@@ -505,6 +536,7 @@ function getSwatch(label: string) {
   if (value.includes("white")) return { bg: "#f5f5f5", color: "#111111", border: "#cfcfcf" };
   if (value.includes("black")) return { bg: "#111111", color: "#ffffff", border: "#3a3a3a" };
   if (value.includes("dark blue")) return { bg: "#243a73", color: "#ffffff", border: "#243a73" };
+  if (value.includes("light blue")) return { bg: "#9ec5e8", color: "#111111", border: "#9ec5e8" };
   if (value.includes("gray suede")) return { bg: "#7f858d", color: "#ffffff", border: "#7f858d" };
   return { bg: "#222222", color: "#ffffff", border: "#3a3a3a" };
 }
