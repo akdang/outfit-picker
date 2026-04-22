@@ -395,6 +395,61 @@ const outfits: Outfit[] = [
   },
 ];
 
+const inventory = {
+  tops: [
+    "White tee",
+    "Light gray tee",
+    "Charcoal tee",
+    "Black tee",
+    "White button-up",
+    "Light gray button-up",
+    "Dark gray button-up",
+    "Sage green button-up",
+    "Beige button-up",
+    "Black button-up",
+  ],
+  pants: [
+    "Black chinos",
+    "Charcoal chinos",
+    "Black jeans",
+    "Dark blue jeans",
+    "Light blue jeans",
+  ],
+  shoes: [
+    "Black sneakers",
+    "White sneakers",
+    "Black boots",
+    "Gray suede boots",
+  ],
+  rings: [
+    "Black thin rectangle ring",
+    "Silver arrow retro ring",
+    "Thin silver band",
+    "Shiny thin silver band",
+    "Silver/black top signet",
+  ],
+  necklaces: [
+    'Silver 3mm box chain (20")',
+    'Black 3mm box chain (20")',
+  ],
+  bracelets: [
+    "Silver matte cuff (3mm)",
+    "Shiny silver cuff (3mm)",
+    "Shiny silver cuff (6mm)",
+    "Shiny silver Mobius bracelet",
+    "Black Mobius bracelet",
+  ],
+  earrings: [
+    "Black studs",
+    "White diamond studs",
+    "Silver/black mixed studs",
+    "Silver gauge",
+    "Black gauge",
+    "Black thin hoop",
+    "Black thick hoop",
+  ],
+};
+
 const moods = ["All", "clean", "day", "easy", "casual", "night", "edge", "date", "smart", "stylish"];
 
 function getOccasionGroup(occasion: string) {
@@ -416,7 +471,8 @@ function getOccasionGroup(occasion: string) {
     value.includes("daily") ||
     value.includes("daytime") ||
     value.includes("weekend") ||
-    value.includes("casual hangout")
+    value.includes("casual hangout") ||
+    value === "casual"
   ) {
     return "Daytime / Casual";
   }
@@ -499,6 +555,47 @@ function uniqueValues(items: Outfit[], key: keyof Outfit): string[] {
   return ["All", ...new Set(items.map((item) => String(item[key])))];
 }
 
+function SectionCard({ title, items }: { title: string; items: string[] }) {
+  const useSwatches = ["Tops", "Pants", "Shoes"].includes(title);
+
+  return (
+    <div style={{ ...cardStyle, background: "#090909" }}>
+      <div
+        style={{
+          fontSize: 11,
+          letterSpacing: 2,
+          textTransform: "uppercase",
+          color: "#888",
+          marginBottom: 12,
+        }}
+      >
+        {title}
+      </div>
+      <div style={{ display: "grid", gap: 8 }}>
+        {items.map((item) =>
+          useSwatches ? (
+            <SwatchBox key={item} label={item} />
+          ) : (
+            <div
+              key={item}
+              style={{
+                border: "1px solid #222",
+                background: "#000",
+                borderRadius: 14,
+                padding: "10px 12px",
+                fontSize: 14,
+                color: "#eee",
+              }}
+            >
+              {item}
+            </div>
+          )
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   const [top, setTop] = useState("All");
   const [pants, setPants] = useState("All");
@@ -508,15 +605,16 @@ export default function App() {
   const [signatureOnly, setSignatureOnly] = useState(false);
   const [selectedId, setSelectedId] = useState<number>(1);
   const [showFilters, setShowFilters] = useState(false);
-  
+  const [screen, setScreen] = useState<"outfits" | "inventory">("outfits");
+
   const resetFilters = () => {
-  setTop("All");
-  setPants("All");
-  setShoes("All");
-  setOccasion("All");
-  setMood("All");
-  setSignatureOnly(false);
-};
+    setTop("All");
+    setPants("All");
+    setShoes("All");
+    setOccasion("All");
+    setMood("All");
+    setSignatureOnly(false);
+  };
 
   const topOptions = uniqueValues(outfits, "top");
   const pantsOptions = uniqueValues(outfits, "pants");
@@ -571,241 +669,394 @@ export default function App() {
               <div style={{ fontSize: 11, letterSpacing: 2, textTransform: "uppercase", color: "#888" }}>
                 Mobile outfit app
               </div>
-              <div style={{ fontSize: 28, fontWeight: 700, marginTop: 6 }}>Outfit Picker</div>
+              <div style={{ fontSize: 28, fontWeight: 700, marginTop: 6 }}>Paul&apos;s Outfit Picker</div>
             </div>
-            <button
-              onClick={randomPick}
-              style={{
-                ...buttonStyle,
-                background: "white",
-                color: "black",
-                border: "none",
-                fontWeight: 600,
-              }}
-            >
-              Random
-            </button>
+            {screen === "outfits" && (
+              <button
+                onClick={randomPick}
+                style={{
+                  ...buttonStyle,
+                  background: "white",
+                  color: "black",
+                  border: "none",
+                  fontWeight: 600,
+                }}
+              >
+                Random
+              </button>
+            )}
           </div>
         </div>
 
         <div style={{ padding: 16 }}>
-          <button
-            onClick={() => setShowFilters((v) => !v)}
-            style={{ ...buttonStyle, width: "100%", borderRadius: 16, marginBottom: 16 }}
-          >
-            {showFilters ? "Hide filters" : "Show filters"}
-          </button>
-
-          {showFilters && (
-            <div style={{ ...cardStyle, marginBottom: 16 }}>
-              <div style={{ display: "grid", gap: 12 }}>
-                <div>
-                  <div style={{ fontSize: 11, letterSpacing: 2, textTransform: "uppercase", color: "#888", marginBottom: 8 }}>
-                    Top
-                  </div>
-                  <select value={top} onChange={(e) => setTop(e.target.value)} style={{ ...buttonStyle, borderRadius: 16, width: "100%" }}>
-                    {topOptions.map((v) => (
-                      <option key={v} value={v}>{v}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <div style={{ fontSize: 11, letterSpacing: 2, textTransform: "uppercase", color: "#888", marginBottom: 8 }}>
-                    Bottom
-                  </div>
-                  <select value={pants} onChange={(e) => setPants(e.target.value)} style={{ ...buttonStyle, borderRadius: 16, width: "100%" }}>
-                    {pantsOptions.map((v) => (
-                      <option key={v} value={v}>{v}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <div style={{ fontSize: 11, letterSpacing: 2, textTransform: "uppercase", color: "#888", marginBottom: 8 }}>
-                    Shoes
-                  </div>
-                  <select value={shoes} onChange={(e) => setShoes(e.target.value)} style={{ ...buttonStyle, borderRadius: 16, width: "100%" }}>
-                    {shoesOptions.map((v) => (
-                      <option key={v} value={v}>{v}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <div style={{ fontSize: 11, letterSpacing: 2, textTransform: "uppercase", color: "#888", marginBottom: 8 }}>
-                    Occasion
-                  </div>
-                  <select value={occasion} onChange={(e) => setOccasion(e.target.value)} style={{ ...buttonStyle, borderRadius: 16, width: "100%" }}>
-                    {occasionOptions.map((v) => (
-                      <option key={v} value={v}>{v}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <div style={{ fontSize: 11, letterSpacing: 2, textTransform: "uppercase", color: "#888", marginBottom: 8 }}>
-                    Mood
-                  </div>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                    {moods.map((item) => {
-                      const active = mood === item;
-                      return (
-                        <button
-                          key={item}
-                          onClick={() => setMood(item)}
-                          style={{
-                            ...buttonStyle,
-                            background: active ? "white" : "#111111",
-                            color: active ? "black" : "white",
-                            borderColor: active ? "white" : "#3a3a3a",
-                          }}
-                        >
-                          {item}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                <label style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 14 }}>
-                  <input type="checkbox" checked={signatureOnly} onChange={(e) => setSignatureOnly(e.target.checked)} />
-                  Signature fits only
-                </label>
-                <button
-                  onClick={resetFilters}
-                  style={{
-                    ...buttonStyle,
-                    width: "100%",
-                    borderRadius: 16,
-                    background: "#1a1a1a",
-                    marginTop: 8,
-                  }}
-                >
-                  Reset all filters
-                </button>                
-              </div>
-            </div>
-          )}
-
-          <div style={cardStyle}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}>
-              <div>
-                <div style={{ fontSize: 11, letterSpacing: 2, textTransform: "uppercase", color: "#888" }}>
-                  Selected
-                </div>
-                <div style={{ fontSize: 28, fontWeight: 700, marginTop: 8 }}>{selected.top}</div>
-                <div style={{ color: "#aaa", marginTop: 6 }}>{selected.pants} · {selected.shoes}</div>
-              </div>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "flex-end" }}>
-                {selected.signature && (
-                  <span style={{ background: "white", color: "black", borderRadius: 999, padding: "6px 10px", fontSize: 12, fontWeight: 700 }}>
-                    Signature
-                  </span>
-                )}
-                <span style={{ border: "1px solid #3a3a3a", borderRadius: 999, padding: "6px 10px", fontSize: 12, color: "#ddd" }}>
-                  {selected.occasion}
-                </span>
-              </div>
-            </div>
-
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginTop: 18 }}>
-              <div>
-                <div style={{ fontSize: 10, letterSpacing: 2, textTransform: "uppercase", color: "#888", marginBottom: 6 }}>Top</div>
-                <SwatchBox label={selected.top} />
-              </div>
-              <div>
-                <div style={{ fontSize: 10, letterSpacing: 2, textTransform: "uppercase", color: "#888", marginBottom: 6 }}>Pants</div>
-                <SwatchBox label={selected.pants} />
-              </div>
-              <div>
-                <div style={{ fontSize: 10, letterSpacing: 2, textTransform: "uppercase", color: "#888", marginBottom: 6 }}>Shoes</div>
-                <SwatchBox label={selected.shoes} />
-              </div>
-            </div>
-
-            <div style={{ ...cardStyle, marginTop: 16, background: "#090909" }}>
-              <div style={{ fontSize: 11, letterSpacing: 2, textTransform: "uppercase", color: "#888", marginBottom: 12 }}>
-                Accessory options
-              </div>
-              <div style={{ display: "grid", gap: 10 }}>
-                {selected.accessories.map((option, idx) => (
-                  <div key={`${selected.id}-${idx}`} style={{ ...cardStyle, padding: 12, background: "#000" }}>
-                    <div style={{ fontSize: 10, letterSpacing: 2, textTransform: "uppercase", color: "#666", marginBottom: 8 }}>
-                      Option {idx + 1}
-                    </div>
-                    <div style={{ fontSize: 14, color: "#eee", lineHeight: 1.5 }}>{option}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 16 }}>
+            <button
+              onClick={() => setScreen("outfits")}
+              style={{
+                ...buttonStyle,
+                borderRadius: 16,
+                background: screen === "outfits" ? "white" : "#111111",
+                color: screen === "outfits" ? "black" : "white",
+                borderColor: screen === "outfits" ? "white" : "#3a3a3a",
+                fontWeight: 600,
+              }}
+            >
+              Outfits
+            </button>
+            <button
+              onClick={() => setScreen("inventory")}
+              style={{
+                ...buttonStyle,
+                borderRadius: 16,
+                background: screen === "inventory" ? "white" : "#111111",
+                color: screen === "inventory" ? "black" : "white",
+                borderColor: screen === "inventory" ? "white" : "#3a3a3a",
+                fontWeight: 600,
+              }}
+            >
+              Inventory
+            </button>
           </div>
 
-          <div style={{ marginTop: 16 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
-              <div style={{ fontSize: 11, letterSpacing: 2, textTransform: "uppercase", color: "#888" }}>Matching outfits</div>
-              <div style={{ fontSize: 12, color: "#777" }}>{filtered.length} found</div>
-            </div>
-            <div style={{ display: "grid", gap: 10 }}>
-              {filtered.map((o) => {
-                const active = selected.id === o.id;
-                const pantsSwatch = getSwatch(o.pants);
-                const shoesSwatch = getSwatch(o.shoes);
-                return (
-                  <button
-                    key={o.id}
-                    onClick={() => setSelectedId(o.id)}
+          {screen === "outfits" ? (
+            <>
+              <button
+                onClick={() => setShowFilters((v) => !v)}
+                style={{ ...buttonStyle, width: "100%", borderRadius: 16, marginBottom: 16 }}
+              >
+                {showFilters ? "Hide filters" : "Show filters"}
+              </button>
+
+              {showFilters && (
+                <div style={{ ...cardStyle, marginBottom: 16 }}>
+                  <div style={{ display: "grid", gap: 12 }}>
+                    <div>
+                      <div style={{ fontSize: 11, letterSpacing: 2, textTransform: "uppercase", color: "#888", marginBottom: 8 }}>
+                        Top
+                      </div>
+                      <select
+                        value={top}
+                        onChange={(e) => setTop(e.target.value)}
+                        style={{ ...buttonStyle, borderRadius: 16, width: "100%" }}
+                      >
+                        {topOptions.map((v) => (
+                          <option key={v} value={v}>
+                            {v}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <div style={{ fontSize: 11, letterSpacing: 2, textTransform: "uppercase", color: "#888", marginBottom: 8 }}>
+                        Bottom
+                      </div>
+                      <select
+                        value={pants}
+                        onChange={(e) => setPants(e.target.value)}
+                        style={{ ...buttonStyle, borderRadius: 16, width: "100%" }}
+                      >
+                        {pantsOptions.map((v) => (
+                          <option key={v} value={v}>
+                            {v}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <div style={{ fontSize: 11, letterSpacing: 2, textTransform: "uppercase", color: "#888", marginBottom: 8 }}>
+                        Shoes
+                      </div>
+                      <select
+                        value={shoes}
+                        onChange={(e) => setShoes(e.target.value)}
+                        style={{ ...buttonStyle, borderRadius: 16, width: "100%" }}
+                      >
+                        {shoesOptions.map((v) => (
+                          <option key={v} value={v}>
+                            {v}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <div style={{ fontSize: 11, letterSpacing: 2, textTransform: "uppercase", color: "#888", marginBottom: 8 }}>
+                        Occasion
+                      </div>
+                      <select
+                        value={occasion}
+                        onChange={(e) => setOccasion(e.target.value)}
+                        style={{ ...buttonStyle, borderRadius: 16, width: "100%" }}
+                      >
+                        {occasionOptions.map((v) => (
+                          <option key={v} value={v}>
+                            {v}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <div style={{ fontSize: 11, letterSpacing: 2, textTransform: "uppercase", color: "#888", marginBottom: 8 }}>
+                        Mood
+                      </div>
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                        {moods.map((item) => {
+                          const active = mood === item;
+                          return (
+                            <button
+                              key={item}
+                              onClick={() => setMood(item)}
+                              style={{
+                                ...buttonStyle,
+                                background: active ? "white" : "#111111",
+                                color: active ? "black" : "white",
+                                borderColor: active ? "white" : "#3a3a3a",
+                              }}
+                            >
+                              {item}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <label style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 14 }}>
+                      <input
+                        type="checkbox"
+                        checked={signatureOnly}
+                        onChange={(e) => setSignatureOnly(e.target.checked)}
+                      />
+                      Signature fits only
+                    </label>
+
+                    <button
+                      onClick={resetFilters}
+                      style={{
+                        ...buttonStyle,
+                        width: "100%",
+                        borderRadius: 16,
+                        background: "#1a1a1a",
+                      }}
+                    >
+                      Reset all filters
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <div style={cardStyle}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}>
+                  <div>
+                    <div style={{ fontSize: 11, letterSpacing: 2, textTransform: "uppercase", color: "#888" }}>
+                      Selected
+                    </div>
+                    <div style={{ fontSize: 28, fontWeight: 700, marginTop: 8 }}>{selected.top}</div>
+                    <div style={{ color: "#aaa", marginTop: 6 }}>
+                      {selected.pants} · {selected.shoes}
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "flex-end" }}>
+                    {selected.signature && (
+                      <span
+                        style={{
+                          background: "white",
+                          color: "black",
+                          borderRadius: 999,
+                          padding: "6px 10px",
+                          fontSize: 12,
+                          fontWeight: 700,
+                        }}
+                      >
+                        Signature
+                      </span>
+                    )}
+                    <span
+                      style={{
+                        border: "1px solid #3a3a3a",
+                        borderRadius: 999,
+                        padding: "6px 10px",
+                        fontSize: 12,
+                        color: "#ddd",
+                      }}
+                    >
+                      {getOccasionGroup(selected.occasion)}
+                    </span>
+                  </div>
+                </div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginTop: 18 }}>
+                  <div>
+                    <div
+                      style={{
+                        fontSize: 10,
+                        letterSpacing: 2,
+                        textTransform: "uppercase",
+                        color: "#888",
+                        marginBottom: 6,
+                      }}
+                    >
+                      Top
+                    </div>
+                    <SwatchBox label={selected.top} />
+                  </div>
+                  <div>
+                    <div
+                      style={{
+                        fontSize: 10,
+                        letterSpacing: 2,
+                        textTransform: "uppercase",
+                        color: "#888",
+                        marginBottom: 6,
+                      }}
+                    >
+                      Pants
+                    </div>
+                    <SwatchBox label={selected.pants} />
+                  </div>
+                  <div>
+                    <div
+                      style={{
+                        fontSize: 10,
+                        letterSpacing: 2,
+                        textTransform: "uppercase",
+                        color: "#888",
+                        marginBottom: 6,
+                      }}
+                    >
+                      Shoes
+                    </div>
+                    <SwatchBox label={selected.shoes} />
+                  </div>
+                </div>
+
+                <div style={{ ...cardStyle, marginTop: 16, background: "#090909" }}>
+                  <div
                     style={{
-                      ...cardStyle,
-                      textAlign: "left",
-                      background: active ? "white" : "#111111",
-                      color: active ? "black" : "white",
-                      borderColor: active ? "white" : "#2a2a2a",
-                      cursor: "pointer",
+                      fontSize: 11,
+                      letterSpacing: 2,
+                      textTransform: "uppercase",
+                      color: "#888",
+                      marginBottom: 12,
                     }}
                   >
-                    <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "flex-start" }}>
-                      <div>
-                        <div style={{ fontSize: 18, fontWeight: 600 }}>{o.top}</div>
-                        <div style={{ marginTop: 8, display: "flex", gap: 6, flexWrap: "wrap" }}>
-                          <span
-                            style={{
-                              padding: "4px 8px",
-                              borderRadius: 999,
-                              fontSize: 12,
-                              background: active ? "#e5e5e5" : pantsSwatch.bg,
-                              color: active ? "#111111" : pantsSwatch.color,
-                              border: `1px solid ${active ? "#d1d1d1" : pantsSwatch.border}`,
-                            }}
-                          >
-                            {o.pants}
-                          </span>
-                          <span
-                            style={{
-                              padding: "4px 8px",
-                              borderRadius: 999,
-                              fontSize: 12,
-                              background: active ? "#e5e5e5" : shoesSwatch.bg,
-                              color: active ? "#111111" : shoesSwatch.color,
-                              border: `1px solid ${active ? "#d1d1d1" : shoesSwatch.border}`,
-                            }}
-                          >
-                            {o.shoes}
-                          </span>
+                    Accessory options
+                  </div>
+                  <div style={{ display: "grid", gap: 10 }}>
+                    {selected.accessories.map((option, idx) => (
+                      <div key={`${selected.id}-${idx}`} style={{ ...cardStyle, padding: 12, background: "#000" }}>
+                        <div
+                          style={{
+                            fontSize: 10,
+                            letterSpacing: 2,
+                            textTransform: "uppercase",
+                            color: "#666",
+                            marginBottom: 8,
+                          }}
+                        >
+                          Option {idx + 1}
                         </div>
+                        <div style={{ fontSize: 14, color: "#eee", lineHeight: 1.5 }}>{option}</div>
                       </div>
-                      {o.signature && (
-                        <span style={{ background: active ? "black" : "#222", color: "white", borderRadius: 999, padding: "6px 10px", fontSize: 12, whiteSpace: "nowrap" }}>
-                          Signature
-                        </span>
-                      )}
-                    </div>
-                    <div style={{ marginTop: 10, fontSize: 13, color: active ? "#555" : "#777" }}>{getOccasionGroup(o.occasion)}</div>
-                  </button>
-                );
-              })}
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ marginTop: 16 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
+                  <div style={{ fontSize: 11, letterSpacing: 2, textTransform: "uppercase", color: "#888" }}>
+                    Matching outfits
+                  </div>
+                  <div style={{ fontSize: 12, color: "#777" }}>{filtered.length} found</div>
+                </div>
+
+                <div style={{ display: "grid", gap: 10 }}>
+                  {filtered.map((o) => {
+                    const active = selected.id === o.id;
+                    const pantsSwatch = getSwatch(o.pants);
+                    const shoesSwatch = getSwatch(o.shoes);
+
+                    return (
+                      <button
+                        key={o.id}
+                        onClick={() => setSelectedId(o.id)}
+                        style={{
+                          ...cardStyle,
+                          textAlign: "left",
+                          background: active ? "white" : "#111111",
+                          color: active ? "black" : "white",
+                          borderColor: active ? "white" : "#2a2a2a",
+                          cursor: "pointer",
+                        }}
+                      >
+                        <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "flex-start" }}>
+                          <div>
+                            <div style={{ fontSize: 18, fontWeight: 600 }}>{o.top}</div>
+                            <div style={{ marginTop: 8, display: "flex", gap: 6, flexWrap: "wrap" }}>
+                              <span
+                                style={{
+                                  padding: "4px 8px",
+                                  borderRadius: 999,
+                                  fontSize: 12,
+                                  background: active ? "#e5e5e5" : pantsSwatch.bg,
+                                  color: active ? "#111111" : pantsSwatch.color,
+                                  border: `1px solid ${active ? "#d1d1d1" : pantsSwatch.border}`,
+                                }}
+                              >
+                                {o.pants}
+                              </span>
+                              <span
+                                style={{
+                                  padding: "4px 8px",
+                                  borderRadius: 999,
+                                  fontSize: 12,
+                                  background: active ? "#e5e5e5" : shoesSwatch.bg,
+                                  color: active ? "#111111" : shoesSwatch.color,
+                                  border: `1px solid ${active ? "#d1d1d1" : shoesSwatch.border}`,
+                                }}
+                              >
+                                {o.shoes}
+                              </span>
+                            </div>
+                          </div>
+                          {o.signature && (
+                            <span
+                              style={{
+                                background: active ? "black" : "#222",
+                                color: "white",
+                                borderRadius: 999,
+                                padding: "6px 10px",
+                                fontSize: 12,
+                                whiteSpace: "nowrap",
+                              }}
+                            >
+                              Signature
+                            </span>
+                          )}
+                        </div>
+                        <div style={{ marginTop: 10, fontSize: 13, color: active ? "#555" : "#777" }}>
+                          {getOccasionGroup(o.occasion)}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </>
+          ) : (
+            <div style={{ display: "grid", gap: 14 }}>
+              <SectionCard title="Tops" items={inventory.tops} />
+              <SectionCard title="Pants" items={inventory.pants} />
+              <SectionCard title="Shoes" items={inventory.shoes} />
+              <SectionCard title="Rings" items={inventory.rings} />
+              <SectionCard title="Necklaces" items={inventory.necklaces} />
+              <SectionCard title="Bracelets" items={inventory.bracelets} />
+              <SectionCard title="Earrings" items={inventory.earrings} />
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
