@@ -420,33 +420,60 @@ function uniqueValues(items: Outfit[], key: keyof Outfit): string[] {
   return ["All", ...new Set(items.map((item) => String(item[key])).filter(Boolean))];
 }
 
-function SectionCard({ title, items }: { title: string; items: WardrobeItem[] }) {
+function SectionCard({
+  title,
+  items,
+  onItemClick,
+}: {
+  title: string;
+  items: WardrobeItem[];
+  onItemClick: (item: WardrobeItem) => void;
+}) {
   return (
     <div style={{ ...cardStyle, background: "#090909" }}>
-    <div
-      style={{
-        fontSize: 16,
-        letterSpacing: 3,
-        textTransform: "uppercase",
-        color: "#aaa",
-        marginBottom: 14,
-        fontWeight: 700,
-        textAlign: "center",
-      }}
-    >
-      {title}
-    </div>
+      <div
+        style={{
+          fontSize: 16,
+          letterSpacing: 3,
+          textTransform: "uppercase",
+          color: "#aaa",
+          marginBottom: 14,
+          fontWeight: 700,
+          textAlign: "center",
+        }}
+      >
+        {title}
+      </div>
 
       {items.length === 0 ? (
         <div style={{ color: "#777", fontSize: 14 }}>No items yet.</div>
       ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: 10,
+          }}
+        >
           {items.map((item) => (
-            <ItemImageCard
+            <button
               key={item.id}
-              label={item.name}
-              imageUrl={getImageUrl(item.image_path)}
-            />
+              onClick={() => onItemClick(item)}
+              style={{
+                border: "none",
+                background: "transparent",
+                padding: 0,
+                margin: 0,
+                cursor: "pointer",
+                color: "inherit",
+                textAlign: "inherit",
+              }}
+            >
+              <ItemImageCard
+                label={item.name}
+                imageUrl={getImageUrl(item.image_path)}
+              />
+            </button>
           ))}
         </div>
       )}
@@ -622,6 +649,29 @@ const outfits: Outfit[] = useMemo(() => {
       behavior: "smooth",
       block: "start",
     });
+  };  
+
+  const filterByWardrobeItem = (item: WardrobeItem) => {
+    if (item.category === "tops") {
+      setTop(item.name);
+    } else if (item.category === "pants") {
+      setPants(item.name);
+    } else if (item.category === "shoes") {
+      setShoes(item.name);
+    } else {
+      setAccessory(item.name);
+    }
+
+    setScreen("outfits");
+    setShowFilters(false);
+    setSelectedId(null);
+
+    window.setTimeout(() => {
+      matchingOutfitsRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 50);
   };  
 
   const resetFilters = () => {
@@ -1314,6 +1364,7 @@ const outfits: Outfit[] = useMemo(() => {
                   key={section.key}
                   title={section.title}
                   items={wardrobe[section.key] ?? []}
+                  onItemClick={filterByWardrobeItem}
                 />
               ))}
             </div>
