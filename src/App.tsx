@@ -750,7 +750,15 @@ export default function App() {
 
   const randomPick = () => {
     if (!filtered.length) return;
-    const next = filtered[Math.floor(Math.random() * filtered.length)];
+
+    if (filtered.length === 1) {
+      setSelectedId(filtered[0].id);
+      return;
+    }
+
+    const availableOutfits = filtered.filter((o) => o.id !== selectedId);
+    const next = availableOutfits[Math.floor(Math.random() * availableOutfits.length)];
+
     setSelectedId(next.id);
   };
 
