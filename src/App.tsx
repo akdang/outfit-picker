@@ -581,32 +581,40 @@ export default function App() {
     loadData();
   }, []);
 
-const outfits: Outfit[] = useMemo(() => {
-  return dbOutfits.map((o) => ({
-    id: o.id,
-    top: o.top?.name ?? "",
-    pants: o.pants?.name ?? "",
-    shoes: o.shoes?.name ?? "",
-    topImageUrl: getImageUrl(o.top?.image_path),
-    pantsImageUrl: getImageUrl(o.pants?.image_path),
-    shoesImageUrl: getImageUrl(o.shoes?.image_path),
-    signature: o.signature,
-    occasion: o.occasion,
-    mood: o.mood ?? [],
-    accessoryOptions: (o.accessoryOptions ?? [])
-      .map((option) => ({
-        id: option.id,
-        optionNumber: option.option_number,
-        originalLabel: option.original_label,
-        items: (option.items ?? [])
-          .slice()
-          .sort((a, b) => a.sort_order - b.sort_order)
-          .map((optionItem) => firstRelation<WardrobeItem>(optionItem.item))
-          .filter((item): item is WardrobeItem => Boolean(item)),
-      }))
-      .sort((a, b) => a.optionNumber - b.optionNumber),
-  }));
-}, [dbOutfits]);
+  const outfits: Outfit[] = useMemo(() => {
+    return dbOutfits.map((o) => ({
+      id: o.id,
+      top: o.top?.name ?? "",
+      pants: o.pants?.name ?? "",
+      shoes: o.shoes?.name ?? "",
+      topImageUrl: getImageUrl(o.top?.image_path),
+      pantsImageUrl: getImageUrl(o.pants?.image_path),
+      shoesImageUrl: getImageUrl(o.shoes?.image_path),
+      signature: o.signature,
+      occasion: o.occasion,
+      mood: o.mood ?? [],
+      accessoryOptions: (o.accessoryOptions ?? [])
+        .map((option) => ({
+          id: option.id,
+          optionNumber: option.option_number,
+          originalLabel: option.original_label,
+          items: (option.items ?? [])
+            .slice()
+            .sort((a, b) => a.sort_order - b.sort_order)
+            .map((optionItem) => firstRelation<WardrobeItem>(optionItem.item))
+            .filter((item): item is WardrobeItem => Boolean(item)),
+        }))
+        .sort((a, b) => a.optionNumber - b.optionNumber),
+    }));
+  }, [dbOutfits]);
+
+  useEffect(() => {
+    if (!outfits.length) return;
+    if (selectedId) return;
+
+    const randomOutfit = outfits[Math.floor(Math.random() * outfits.length)];
+    setSelectedId(randomOutfit.id);
+  }, [outfits, selectedId]);  
 
   const wardrobe = useMemo(() => {
     const grouped: Record<string, WardrobeItem[]> = {};
@@ -726,7 +734,7 @@ const outfits: Outfit[] = useMemo(() => {
 
   const selected = selectedId
     ? filtered.find((o) => o.id === selectedId) || filtered[0]
-    : filtered[0];
+    : null;
 
   const selectMatchingOutfit = (id: string) => {
     setSelectedId(id);
@@ -846,7 +854,8 @@ const outfits: Outfit[] = useMemo(() => {
               Random
             </button>
 
-            <div
+            <button
+              onClick={resetFilters}
               style={{
                 height: 14,
                 fontSize: 11,
@@ -854,10 +863,16 @@ const outfits: Outfit[] = useMemo(() => {
                 textAlign: "center",
                 whiteSpace: "nowrap",
                 visibility: activeFilterCount > 0 ? "visible" : "hidden",
+                background: "transparent",
+                border: "none",
+                padding: 0,
+                margin: 0,
+                cursor: activeFilterCount > 0 ? "pointer" : "default",
+                textDecoration: "underline",
               }}
             >
-              {activeFilterCount} {activeFilterCount === 1 ? "filter" : "filters"}
-            </div>
+              Reset {activeFilterCount} {activeFilterCount === 1 ? "filter" : "filters"}
+            </button>
           </div>
         )}
           </div>
