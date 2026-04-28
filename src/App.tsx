@@ -472,6 +472,8 @@ export default function App() {
   const matchingOutfitsRef = useRef<HTMLDivElement | null>(null);  
   const selectedOutfitRef = useRef<HTMLDivElement | null>(null);  
 
+  const [accessory, setAccessory] = useState("All");
+
   const activeFilterCount = useMemo(() => {
     let count = 0;
 
@@ -481,9 +483,10 @@ export default function App() {
     if (occasion !== "All") count += 1;
     if (mood !== "All") count += 1;
     if (signatureOnly) count += 1;
+    if (accessory !== "All") count += 1;
 
     return count;
-  }, [top, pants, shoes, occasion, mood, signatureOnly]);  
+    }, [top, pants, shoes, occasion, mood, accessory, signatureOnly]);
 
   useEffect(() => {
     async function loadData() {
@@ -627,6 +630,7 @@ const outfits: Outfit[] = useMemo(() => {
     setShoes("All");
     setOccasion("All");
     setMood("All");
+    setAccessory("All");
     setSignatureOnly(false);
   };
 
@@ -634,10 +638,29 @@ const outfits: Outfit[] = useMemo(() => {
   const pantsOptions = uniqueValues(outfits, "pants");
   const shoesOptions = uniqueValues(outfits, "shoes");
   const occasionOptions = uniqueOccasionGroups(outfits);
+  const accessoryOptions = useMemo(() => {
+    const values = new Set<string>();
+
+    for (const outfit of outfits) {
+      for (const option of outfit.accessoryOptions) {
+        for (const item of option.items) {
+          if (item.name) values.add(item.name);
+        }
+      }
+    }
+
+    return ["All", ...Array.from(values).sort()];
+  }, [outfits]);  
 
   const filtered = useMemo(() => {
     return outfits.filter((o) => {
       const moodMatch = mood === "All" || o.mood.includes(mood);
+
+      const accessoryMatch =
+        accessory === "All" ||
+        o.accessoryOptions.some((option) =>
+          option.items.some((item) => item.name === accessory)
+        );
 
       return (
         (top === "All" || o.top === top) &&
@@ -645,10 +668,11 @@ const outfits: Outfit[] = useMemo(() => {
         (shoes === "All" || o.shoes === shoes) &&
         (occasion === "All" || getOccasionGroup(o.occasion) === occasion) &&
         (!signatureOnly || o.signature) &&
-        moodMatch
+        moodMatch &&
+        accessoryMatch
       );
     });
-  }, [outfits, top, pants, shoes, occasion, mood, signatureOnly]);
+  }, [outfits, top, pants, shoes, occasion, mood, accessory, signatureOnly]);
 
   const selected = selectedId
     ? filtered.find((o) => o.id === selectedId) || filtered[0]
@@ -909,6 +933,32 @@ const outfits: Outfit[] = useMemo(() => {
                         ))}
                       </select>
                     </div>
+
+                    <div>
+                      <div
+                        style={{
+                          fontSize: 11,
+                          letterSpacing: 2,
+                          textTransform: "uppercase",
+                          color: "#888",
+                          marginBottom: 8,
+                        }}
+                      >
+                        Accessory
+                      </div>
+
+                      <select
+                        value={accessory}
+                        onChange={(e) => setAccessory(e.target.value)}
+                        style={{ ...buttonStyle, borderRadius: 16, width: "100%" }}
+                      >
+                        {accessoryOptions.map((v) => (
+                          <option key={v} value={v}>
+                            {v}
+                          </option>
+                        ))}
+                      </select>
+                    </div>                    
 
                     <div>
                       <div
