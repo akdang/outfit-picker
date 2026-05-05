@@ -537,88 +537,88 @@ function ItemImageCard({
     </div>
   );
 }
-function SmallItemImageCard({
-  label,
-  imageUrl,
-}: {
-  label: string;
-  imageUrl: string | null;
-}) {
-  const [imageFailed, setImageFailed] = useState(false);
+// function SmallItemImageCard({
+//   label,
+//   imageUrl,
+// }: {
+//   label: string;
+//   imageUrl: string | null;
+// }) {
+//   const [imageFailed, setImageFailed] = useState(false);
 
-  if (!imageUrl || imageFailed) {
-    return (
-      <div
-        style={{
-          border: "1px solid #2a2a2a",
-          borderRadius: 10,
-          background: "#111",
-          minHeight: 76,
-          padding: 8,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          textAlign: "center",
-          fontSize: 11,
-          fontWeight: 700,
-          color: "#eee",
-          lineHeight: 1.2,
-        }}
-      >
-        {label}
-      </div>
-    );
-  }
+//   if (!imageUrl || imageFailed) {
+//     return (
+//       <div
+//         style={{
+//           border: "1px solid #2a2a2a",
+//           borderRadius: 10,
+//           background: "#111",
+//           minHeight: 76,
+//           padding: 8,
+//           display: "flex",
+//           alignItems: "center",
+//           justifyContent: "center",
+//           textAlign: "center",
+//           fontSize: 11,
+//           fontWeight: 700,
+//           color: "#eee",
+//           lineHeight: 1.2,
+//         }}
+//       >
+//         {label}
+//       </div>
+//     );
+//   }
 
-  return (
-    <div
-      style={{
-        border: "1px solid #2a2a2a",
-        borderRadius: 10,
-        overflow: "hidden",
-        background: "#090909",
-      }}
-    >
-      <div
-        style={{
-          width: "100%",
-          height: 54,
-          background: "#fff",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: 4,
-          boxSizing: "border-box",
-        }}
-      >
-        <img
-          src={imageUrl}
-          alt={label}
-          onError={() => setImageFailed(true)}
-          style={{
-            maxWidth: "100%",
-            maxHeight: "100%",
-            objectFit: "contain",
-            display: "block",
-          }}
-        />
-      </div>
+//   return (
+//     <div
+//       style={{
+//         border: "1px solid #2a2a2a",
+//         borderRadius: 10,
+//         overflow: "hidden",
+//         background: "#090909",
+//       }}
+//     >
+//       <div
+//         style={{
+//           width: "100%",
+//           height: 54,
+//           background: "#fff",
+//           display: "flex",
+//           alignItems: "center",
+//           justifyContent: "center",
+//           padding: 4,
+//           boxSizing: "border-box",
+//         }}
+//       >
+//         <img
+//           src={imageUrl}
+//           alt={label}
+//           onError={() => setImageFailed(true)}
+//           style={{
+//             maxWidth: "100%",
+//             maxHeight: "100%",
+//             objectFit: "contain",
+//             display: "block",
+//           }}
+//         />
+//       </div>
 
-      <div
-        style={{
-          padding: "6px 6px",
-          fontSize: 10,
-          fontWeight: 700,
-          textAlign: "center",
-          color: "#eee",
-          lineHeight: 1.2,
-        }}
-      >
-        {label}
-      </div>
-    </div>
-  );
-}
+//       <div
+//         style={{
+//           padding: "6px 6px",
+//           fontSize: 10,
+//           fontWeight: 700,
+//           textAlign: "center",
+//           color: "#eee",
+//           lineHeight: 1.2,
+//         }}
+//       >
+//         {label}
+//       </div>
+//     </div>
+//   );
+// }
 
 
 function TinyItemImage({
