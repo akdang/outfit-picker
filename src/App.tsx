@@ -1323,6 +1323,19 @@ const getImageFilterOptions = (category: string, optionValues: string[]) => {
 
       {filterMode === "dropdowns" ? (
         <>
+      <button
+        onClick={jumpToFilteredOutfits}
+        style={{
+          ...buttonStyle,
+          width: "100%",
+          borderRadius: 16,
+          background: "#1a1a1a",
+          color: "white",
+          borderColor: "#3a3a3a",
+        }}
+      >
+        Jump to filtered outfits
+      </button>        
           <div>
             <div
               style={{
@@ -1533,6 +1546,19 @@ const getImageFilterOptions = (category: string, optionValues: string[]) => {
         </>
       ) : (
         <>
+          <button
+            onClick={jumpToFilteredOutfits}
+            style={{
+              ...buttonStyle,
+              width: "100%",
+              borderRadius: 16,
+              background: "#1a1a1a",
+              color: "white",
+              borderColor: "#3a3a3a",
+            }}
+          >
+            Jump to filtered outfits
+          </button>        
           <ImageFilterButtons
             title="Top"
             value={top}
