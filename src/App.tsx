@@ -1878,7 +1878,7 @@ const getImageFilterOptions = (category: string, optionValues: string[]) => {
                                   overflow: "hidden",
                                 }}
                               >
-                              <div
+                              {/* <div
                                 style={{
                                   fontSize: 10,
                                   letterSpacing: 2,
@@ -1889,7 +1889,7 @@ const getImageFilterOptions = (category: string, optionValues: string[]) => {
                                 }}
                               >
                                 Option {option.optionNumber}
-                              </div>
+                              </div> */}
 
                               <div
                                 style={{
