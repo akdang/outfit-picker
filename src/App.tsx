@@ -499,7 +499,12 @@ export default function App() {
   const matchingOutfitsRef = useRef<HTMLDivElement | null>(null);  
   const selectedOutfitRef = useRef<HTMLDivElement | null>(null);  
 
-  const [accessory, setAccessory] = useState("All");
+  const [necklace, setNecklace] = useState("All");
+  const [bracelet, setBracelet] = useState("All");
+  const [ring, setRing] = useState("All");
+  const [earring, setEarring] = useState("All");
+
+  const [showBackToTop, setShowBackToTop] = useState(false);
 
   const activeFilterCount = useMemo(() => {
     let count = 0;
@@ -508,12 +513,26 @@ export default function App() {
     if (pants !== "All") count += 1;
     if (shoes !== "All") count += 1;
     if (occasion !== "All") count += 1;
-    if (mood !== "All") count += 1;
+    // if (mood !== "All") count += 1;
     if (signatureOnly) count += 1;
-    if (accessory !== "All") count += 1;
-
+    if (necklace !== "All") count += 1;
+    if (bracelet !== "All") count += 1;
+    if (ring !== "All") count += 1;
+    if (earring !== "All") count += 1;
+    
     return count;
-    }, [top, pants, shoes, occasion, mood, accessory, signatureOnly]);
+    }, [top, pants, shoes, occasion, mood, necklace, bracelet, ring, earring, signatureOnly]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowBackToTop(window.scrollY > 500);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    handleScroll();
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);    
 
   useEffect(() => {
     async function loadData() {
@@ -580,6 +599,13 @@ export default function App() {
 
     loadData();
   }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };  
 
   const outfits: Outfit[] = useMemo(() => {
     return dbOutfits.map((o) => ({
@@ -666,8 +692,14 @@ export default function App() {
       setPants(item.name);
     } else if (item.category === "shoes") {
       setShoes(item.name);
-    } else {
-      setAccessory(item.name);
+    } else if (item.category === "necklaces") {
+      setNecklace(item.name);
+    } else if (item.category === "bracelets") {
+      setBracelet(item.name);
+    } else if (item.category === "rings") {
+      setRing(item.name);
+    } else if (item.category === "earrings") {
+      setEarring(item.name);
     }
 
     setScreen("outfits");
@@ -688,7 +720,10 @@ export default function App() {
     setShoes("All");
     setOccasion("All");
     setMood("All");
-    setAccessory("All");
+    setNecklace("All");
+    setBracelet("All");
+    setRing("All");
+    setEarring("All");
     setSignatureOnly(false);
   };
 
@@ -696,29 +731,64 @@ export default function App() {
   const pantsOptions = uniqueValues(outfits, "pants");
   const shoesOptions = uniqueValues(outfits, "shoes");
   const occasionOptions = uniqueOccasionGroups(outfits);
-  const accessoryOptions = useMemo(() => {
+  const getAccessoryOptionsByCategory = (category: string) => {
     const values = new Set<string>();
 
     for (const outfit of outfits) {
       for (const option of outfit.accessoryOptions) {
         for (const item of option.items) {
-          if (item.name) values.add(item.name);
+          if (item.category === category && item.name) {
+            values.add(item.name);
+          }
         }
       }
     }
 
     return ["All", ...Array.from(values).sort()];
-  }, [outfits]);  
+  };
+
+  const necklaceOptions = useMemo(
+    () => getAccessoryOptionsByCategory("necklaces"),
+    [outfits]
+  );
+
+  const braceletOptions = useMemo(
+    () => getAccessoryOptionsByCategory("bracelets"),
+    [outfits]
+  );
+
+  const ringOptions = useMemo(
+    () => getAccessoryOptionsByCategory("rings"),
+    [outfits]
+  );
+
+  const earringOptions = useMemo(
+    () => getAccessoryOptionsByCategory("earrings"),
+    [outfits]
+  ); 
 
   const filtered = useMemo(() => {
     return outfits.filter((o) => {
       const moodMatch = mood === "All" || o.mood.includes(mood);
 
-      const accessoryMatch =
-        accessory === "All" ||
-        o.accessoryOptions.some((option) =>
-          option.items.some((item) => item.name === accessory)
-        );
+  const selectedAccessoryFilters = [
+    { category: "necklaces", value: necklace },
+    { category: "bracelets", value: bracelet },
+    { category: "rings", value: ring },
+    { category: "earrings", value: earring },
+  ].filter((filter) => filter.value !== "All");
+
+  const accessoryMatch =
+    selectedAccessoryFilters.length === 0 ||
+    o.accessoryOptions.some((option) =>
+      selectedAccessoryFilters.every((filter) =>
+        option.items.some(
+          (item) =>
+            item.category === filter.category &&
+            item.name === filter.value
+        )
+      )
+    );
 
       return (
         (top === "All" || o.top === top) &&
@@ -730,7 +800,19 @@ export default function App() {
         accessoryMatch
       );
     });
-  }, [outfits, top, pants, shoes, occasion, mood, accessory, signatureOnly]);
+    }, [
+    outfits,
+    top,
+    pants,
+    shoes,
+    occasion,
+    mood,
+    necklace,
+    bracelet,
+    ring,
+    earring,
+    signatureOnly,
+  ]);
 
   const selected = selectedId
     ? filtered.find((o) => o.id === selectedId) || filtered[0]
@@ -1017,21 +1099,99 @@ export default function App() {
                           marginBottom: 8,
                         }}
                       >
-                        Accessory
+                        Necklace
                       </div>
 
                       <select
-                        value={accessory}
-                        onChange={(e) => setAccessory(e.target.value)}
+                        value={necklace}
+                        onChange={(e) => setNecklace(e.target.value)}
                         style={{ ...buttonStyle, borderRadius: 16, width: "100%" }}
                       >
-                        {accessoryOptions.map((v) => (
+                        {necklaceOptions.map((v) => (
                           <option key={v} value={v}>
                             {v}
                           </option>
                         ))}
                       </select>
-                    </div>                    
+                    </div>
+
+                    <div>
+                      <div
+                        style={{
+                          fontSize: 11,
+                          letterSpacing: 2,
+                          textTransform: "uppercase",
+                          color: "#888",
+                          marginBottom: 8,
+                        }}
+                      >
+                        Bracelet
+                      </div>
+
+                      <select
+                        value={bracelet}
+                        onChange={(e) => setBracelet(e.target.value)}
+                        style={{ ...buttonStyle, borderRadius: 16, width: "100%" }}
+                      >
+                        {braceletOptions.map((v) => (
+                          <option key={v} value={v}>
+                            {v}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <div
+                        style={{
+                          fontSize: 11,
+                          letterSpacing: 2,
+                          textTransform: "uppercase",
+                          color: "#888",
+                          marginBottom: 8,
+                        }}
+                      >
+                        Ring
+                      </div>
+
+                      <select
+                        value={ring}
+                        onChange={(e) => setRing(e.target.value)}
+                        style={{ ...buttonStyle, borderRadius: 16, width: "100%" }}
+                      >
+                        {ringOptions.map((v) => (
+                          <option key={v} value={v}>
+                            {v}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <div
+                        style={{
+                          fontSize: 11,
+                          letterSpacing: 2,
+                          textTransform: "uppercase",
+                          color: "#888",
+                          marginBottom: 8,
+                        }}
+                      >
+                        Earring
+                      </div>
+
+                      <select
+                        value={earring}
+                        onChange={(e) => setEarring(e.target.value)}
+                        style={{ ...buttonStyle, borderRadius: 16, width: "100%" }}
+                      >
+                        {earringOptions.map((v) => (
+                          <option key={v} value={v}>
+                            {v}
+                          </option>
+                        ))}
+                      </select>
+                    </div>                 
 
                     <div>
                       <div
@@ -1059,7 +1219,7 @@ export default function App() {
                       </select>
                     </div>
 
-                    <div>
+                    {/* <div>
                       <div
                         style={{
                           fontSize: 11,
@@ -1092,7 +1252,7 @@ export default function App() {
                           );
                         })}
                       </div>
-                    </div>
+                    </div> */}
 
                     <label style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 14 }}>
                       <input
@@ -1394,6 +1554,46 @@ export default function App() {
           )}
         </div>
       </div>
+ 
+      {showBackToTop && (
+      <button
+        onClick={scrollToTop}
+        aria-label="Back to top"
+        style={{
+          position: "fixed",
+          right: 18,
+          bottom: 18,
+          zIndex: 50,
+          width: 48,
+          height: 48,
+          borderRadius: 999,
+          border: "1px solid #3a3a3a",
+          background: "white",
+          color: "black",
+          cursor: "pointer",
+          boxShadow: "0 8px 24px rgba(0,0,0,0.35)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: 0,
+        }}
+      >
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M12 19V5" />
+          <path d="M6 11l6-6 6 6" />
+        </svg>
+      </button>
+    )}
+      
     </div>
   );
 }
