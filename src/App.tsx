@@ -56,18 +56,18 @@ type Outfit = {
   accessoryOptions: AccessoryOption[];
 };
 
-const baseMoods = [
-  "All",
-  "clean",
-  "day",
-  "easy",
-  "casual",
-  "night",
-  "edge",
-  "date",
-  "smart",
-  "stylish",
-];
+// const baseMoods = [
+//   "All",
+//   "clean",
+//   "day",
+//   "easy",
+//   "casual",
+//   "night",
+//   "edge",
+//   "date",
+//   "smart",
+//   "stylish",
+// ];
 
 const wardrobeSections = [
   { key: "tops", title: "Tops" },
