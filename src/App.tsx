@@ -103,8 +103,8 @@ function getImageUrl(imagePath?: string | null) {
 function getOccasionGroup(occasion: string) {
   const value = occasion.toLowerCase();
 
-  if (value.includes("date")) return "Date";
-  if (value.includes("office")) return "Office / Smart Casual";
+  if (value.includes("date")) return "🍸 Date";
+  if (value.includes("office")) return "👔 Office / Smart Casual";
 
   if (
     value.includes("night") ||
@@ -112,7 +112,7 @@ function getOccasionGroup(occasion: string) {
     value.includes("dinner") ||
     value.includes("upscale")
   ) {
-    return "Night / Going Out";
+    return "🌙 Night / Going Out";
   }
 
   if (
@@ -122,7 +122,7 @@ function getOccasionGroup(occasion: string) {
     value.includes("casual hangout") ||
     value === "casual"
   ) {
-    return "Daytime / Casual";
+    return "☀️ Daytime / Casual";
   }
 
   if (
@@ -133,7 +133,7 @@ function getOccasionGroup(occasion: string) {
     value.includes("clean daytime") ||
     value.includes("soft daytime")
   ) {
-    return "Elevated / Stylish";
+    return "🔥 Elevated / Stylish";
   }
 
   return occasion;
@@ -187,14 +187,220 @@ function SwatchBox({ label }: { label: string }) {
   );
 }
 
+type ImageFilterOption = {
+  value: string;
+  item: WardrobeItem | null;
+};
+
+
+function ImageFilterButtons({
+  title,
+  value,
+  options,
+  onChange,
+}: {
+  title: string;
+  value: string;
+  options: ImageFilterOption[];
+  onChange: (value: string) => void;
+}) {
+  const isBottom = title === "Bottom";
+  const isShoes = title === "Shoes";
+  const isAccessory = ["Necklace", "Bracelet", "Ring", "Earring"].includes(title);
+
+  const imageScale = isBottom ? 2.15 : isShoes ? 1.35 : isAccessory ? 1.2 : 1.1;
+
+  return (
+    <div>
+      <div
+        style={{
+          fontSize: 14,
+          letterSpacing: 3,
+          textTransform: "uppercase",
+          color: "#888",
+          marginBottom: 10,
+          textAlign: "center",
+          fontWeight: 700,
+        }}
+      >
+        {title}
+      </div>
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(4, 1fr)",
+          gap: 10,
+        }}
+      >
+        {options.map((option) => {
+          const active = value === option.value;
+          const imageUrl = option.item ? getImageUrl(option.item.image_path) : null;
+
+          return (
+            <button
+              key={option.value}
+              onClick={() => onChange(option.value)}
+              title={option.value}
+              aria-label={option.value}
+              style={{
+                height: 66,
+                borderRadius: 14,
+                border: active ? "2px solid white" : "1px solid #333",
+                background: active ? "#1f1f1f" : "#090909",
+                color: "white",
+                padding: 0,
+                cursor: "pointer",
+                overflow: "hidden",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                boxShadow: active ? "0 0 0 2px rgba(255,255,255,0.12)" : "none",
+              }}
+            >
+              {option.value === "All" ? (
+                <span
+                  style={{
+                    fontSize: 12,
+                    fontWeight: 900,
+                    letterSpacing: 1,
+                  }}
+                >
+                  ALL
+                </span>
+              ) : imageUrl ? (
+                <div
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    background: "#fff",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    overflow: "hidden",
+                  }}
+                >
+                  <img
+                    src={imageUrl}
+                    alt={option.value}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "contain",
+                      display: "block",
+                      transform: `scale(${imageScale})`,
+                    }}
+                  />
+                </div>
+              ) : (
+                <span
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 900,
+                  }}
+                >
+                  {option.value.slice(0, 1).toUpperCase()}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      {value !== "All" && (
+        <div
+          style={{
+            marginTop: 8,
+            fontSize: 12,
+            color: "#aaa",
+            textAlign: "center",
+            lineHeight: 1.3,
+          }}
+        >
+          Selected:{" "}
+          <span style={{ color: "#fff", fontWeight: 700 }}>
+            {value}
+          </span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function TextFilterButtons({
+  title,
+  value,
+  options,
+  onChange,
+}: {
+  title: string;
+  value: string;
+  options: string[];
+  onChange: (value: string) => void;
+}) {
+  return (
+    <div>
+      <div
+        style={{
+          fontSize: 14,
+          letterSpacing: 3,
+          textTransform: "uppercase",
+          color: "#888",
+          marginBottom: 10,
+          textAlign: "center",
+          fontWeight: 700,
+        }}
+      >
+        {title}
+      </div>
+
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+        {options.map((option) => {
+          const active = value === option;
+
+          return (
+            <button
+              key={option}
+              onClick={() => onChange(option)}
+              style={{
+                ...buttonStyle,
+                background: active ? "white" : "#111111",
+                color: active ? "black" : "white",
+                borderColor: active ? "white" : "#3a3a3a",
+              }}
+            >
+              {option}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function getImageScale(category?: string | null, size: "large" | "tiny" = "large") {
+  if (category === "pants") {
+    return size === "tiny" ? 2.1 : 2.25;
+  }
+
+  if (category === "shoes") {
+    return size === "tiny" ? 1.2 : 1.15;
+  }
+
+  return 1;
+}
+
 function ItemImageCard({
   label,
   imageUrl,
+  category,
 }: {
   label: string;
   imageUrl: string | null;
+  category?: string | null;
 }) {
   const [imageFailed, setImageFailed] = useState(false);
+  const imageScale = getImageScale(category, "large");
 
   if (!imageUrl || imageFailed) {
     return <SwatchBox label={imageFailed ? `${label}\nImage failed` : label} />;
@@ -220,6 +426,7 @@ function ItemImageCard({
           justifyContent: "center",
           padding: 6,
           boxSizing: "border-box",
+          overflow: "hidden",
         }}
       >
         <img
@@ -227,10 +434,11 @@ function ItemImageCard({
           alt={label}
           onError={() => setImageFailed(true)}
           style={{
-            maxWidth: "100%",
-            maxHeight: "100%",
+            width: "100%",
+            height: "100%",
             objectFit: "contain",
             display: "block",
+            transform: `scale(${imageScale})`,
           }}
         />
       </div>
@@ -337,12 +545,15 @@ function SmallItemImageCard({
 function TinyItemImage({
   label,
   imageUrl,
+  category,
 }: {
   label: string;
   imageUrl: string | null;
+  category?: string | null;
 }) {
   const [imageFailed, setImageFailed] = useState(false);
   const swatch = getSwatch(label);
+  const imageScale = getImageScale(category, "tiny");
 
   return (
     <div
@@ -359,17 +570,30 @@ function TinyItemImage({
       title={label}
     >
       {imageUrl && !imageFailed ? (
-        <img
-          src={imageUrl}
-          alt={label}
-          onError={() => setImageFailed(true)}
+        <div
           style={{
             width: "100%",
             height: "100%",
-            objectFit: "cover",
-            display: "block",
+            background: "#fff",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            overflow: "hidden",
           }}
-        />
+        >
+          <img
+            src={imageUrl}
+            alt={label}
+            onError={() => setImageFailed(true)}
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "contain",
+              display: "block",
+              transform: `scale(${imageScale})`,
+            }}
+          />
+        </div>
       ) : (
         <div
           style={{
@@ -392,9 +616,21 @@ function TinyItemImage({
 function OutfitImageStrip({ outfit }: { outfit: Outfit }) {
   return (
     <div style={{ display: "flex", gap: 6, marginTop: 10 }}>
-      <TinyItemImage label={outfit.top} imageUrl={outfit.topImageUrl} />
-      <TinyItemImage label={outfit.pants} imageUrl={outfit.pantsImageUrl} />
-      <TinyItemImage label={outfit.shoes} imageUrl={outfit.shoesImageUrl} />
+      <TinyItemImage
+        label={outfit.top}
+        imageUrl={outfit.topImageUrl}
+        category="tops"
+      />
+      <TinyItemImage
+        label={outfit.pants}
+        imageUrl={outfit.pantsImageUrl}
+        category="pants"
+      />
+      <TinyItemImage
+        label={outfit.shoes}
+        imageUrl={outfit.shoesImageUrl}
+        category="shoes"
+      />
     </div>
   );
 }
@@ -469,10 +705,12 @@ function SectionCard({
                 textAlign: "inherit",
               }}
             >
-              <ItemImageCard
-                label={item.name}
-                imageUrl={getImageUrl(item.image_path)}
-              />
+            <ItemImageCard
+              key={item.id}
+              label={item.name}
+              imageUrl={getImageUrl(item.image_path)}
+              category={item.category}
+            />
             </button>
           ))}
         </div>
@@ -503,6 +741,8 @@ export default function App() {
   const [bracelet, setBracelet] = useState("All");
   const [ring, setRing] = useState("All");
   const [earring, setEarring] = useState("All");
+
+  const [filterMode, setFilterMode] = useState<"dropdowns" | "buttons">("buttons");
 
   const [showBackToTop, setShowBackToTop] = useState(false);
 
@@ -606,6 +846,21 @@ export default function App() {
       behavior: "smooth",
     });
   };  
+
+const getImageFilterOptions = (category: string, optionValues: string[]) => {
+  return optionValues.map((optionValue) => ({
+    value: optionValue,
+    item:
+      optionValue === "All"
+        ? null
+        : wardrobeItems.find(
+            (item) =>
+              item.category === category &&
+              item.name === optionValue &&
+              item.active
+          ) ?? null,
+  }));
+};  
 
   const outfits: Outfit[] = useMemo(() => {
     return dbOutfits.map((o) => ({
@@ -731,6 +986,7 @@ export default function App() {
   const pantsOptions = uniqueValues(outfits, "pants");
   const shoesOptions = uniqueValues(outfits, "shoes");
   const occasionOptions = uniqueOccasionGroups(outfits);
+  
   const getAccessoryOptionsByCategory = (category: string) => {
     const values = new Set<string>();
 
@@ -766,6 +1022,41 @@ export default function App() {
     () => getAccessoryOptionsByCategory("earrings"),
     [outfits]
   ); 
+
+  const topImageOptions = useMemo(
+    () => getImageFilterOptions("tops", topOptions),
+    [wardrobeItems, topOptions]
+  );
+
+  const pantsImageOptions = useMemo(
+    () => getImageFilterOptions("pants", pantsOptions),
+    [wardrobeItems, pantsOptions]
+  );
+
+  const shoesImageOptions = useMemo(
+    () => getImageFilterOptions("shoes", shoesOptions),
+    [wardrobeItems, shoesOptions]
+  );
+
+  const necklaceImageOptions = useMemo(
+    () => getImageFilterOptions("necklaces", necklaceOptions),
+    [wardrobeItems, necklaceOptions]
+  );
+
+  const braceletImageOptions = useMemo(
+    () => getImageFilterOptions("bracelets", braceletOptions),
+    [wardrobeItems, braceletOptions]
+  );
+
+  const ringImageOptions = useMemo(
+    () => getImageFilterOptions("rings", ringOptions),
+    [wardrobeItems, ringOptions]
+  );
+
+  const earringImageOptions = useMemo(
+    () => getImageFilterOptions("earrings", earringOptions),
+    [wardrobeItems, earringOptions]
+  );  
 
   const filtered = useMemo(() => {
     return outfits.filter((o) => {
@@ -931,18 +1222,20 @@ export default function App() {
 
           {screen === "outfits" && (
           <div style={{ display: "grid", gap: 6, justifyItems: "center" }}>
-            <button
-              onClick={randomPick}
-              style={{
-                ...buttonStyle,
-                background: "white",
-                color: "black",
-                border: "none",
-                fontWeight: 600,
-              }}
-            >
-              Random
-            </button>
+          <button
+            onClick={randomPick}
+            style={{
+              ...buttonStyle,
+              borderRadius: 16,
+              background: "#111111",
+              color: "white",
+              borderColor: "#3a3a3a",
+              fontWeight: 600,
+              minWidth: 96,
+            }}
+          >
+            🎲 Random
+          </button>
 
             <button
               onClick={resetFilters}
@@ -981,7 +1274,7 @@ export default function App() {
                 fontWeight: 600,
               }}
             >
-              Outfits
+              ✨ Outfits
             </button>
 
             <button
@@ -995,7 +1288,7 @@ export default function App() {
                 fontWeight: 600,
               }}
             >
-              Wardrobe
+              👔 Wardrobe
             </button>
           </div>
 
@@ -1005,293 +1298,336 @@ export default function App() {
                 onClick={() => setShowFilters((v) => !v)}
                 style={{ ...buttonStyle, width: "100%", borderRadius: 16, marginBottom: 16 }}
               >
-                {showFilters ? "Hide filters" : "Show filters"}
+                {showFilters ? "✕ Hide filters" : "🔎 Show filters"}
               </button>
-
+              
               {showFilters && (
-                <div style={{ ...cardStyle, marginBottom: 16 }}>
-                  <div style={{ display: "grid", gap: 12 }}>
-                    <div>
-                      <div
-                        style={{
-                          fontSize: 11,
-                          letterSpacing: 2,
-                          textTransform: "uppercase",
-                          color: "#888",
-                          marginBottom: 8,
-                        }}
-                      >
-                        Top
-                      </div>
+  <div style={{ ...cardStyle, marginBottom: 16 }}>
+    <div style={{ display: "grid", gap: 12 }}>
+      <button
+        onClick={() =>
+          setFilterMode((current) =>
+            current === "dropdowns" ? "buttons" : "dropdowns"
+          )
+        }
+        style={{
+          ...buttonStyle,
+          width: "100%",
+          borderRadius: 16,
+          background: "#1a1a1a",
+          marginBottom: 4,
+        }}
+      >
+        {filterMode === "dropdowns" ? "Use image buttons" : "Use dropdowns"}
+      </button>
 
-                      <select
-                        value={top}
-                        onChange={(e) => setTop(e.target.value)}
-                        style={{ ...buttonStyle, borderRadius: 16, width: "100%" }}
-                      >
-                        {topOptions.map((v) => (
-                          <option key={v} value={v}>
-                            {v}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+      {filterMode === "dropdowns" ? (
+        <>
+          <div>
+            <div
+              style={{
+                fontSize: 11,
+                letterSpacing: 2,
+                textTransform: "uppercase",
+                color: "#888",
+                marginBottom: 8,
+              }}
+            >
+              Top
+            </div>
 
-                    <div>
-                      <div
-                        style={{
-                          fontSize: 11,
-                          letterSpacing: 2,
-                          textTransform: "uppercase",
-                          color: "#888",
-                          marginBottom: 8,
-                        }}
-                      >
-                        Bottom
-                      </div>
+            <select
+              value={top}
+              onChange={(e) => setTop(e.target.value)}
+              style={{ ...buttonStyle, borderRadius: 16, width: "100%" }}
+            >
+              {topOptions.map((v) => (
+                <option key={v} value={v}>
+                  {v}
+                </option>
+              ))}
+            </select>
+          </div>
 
-                      <select
-                        value={pants}
-                        onChange={(e) => setPants(e.target.value)}
-                        style={{ ...buttonStyle, borderRadius: 16, width: "100%" }}
-                      >
-                        {pantsOptions.map((v) => (
-                          <option key={v} value={v}>
-                            {v}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+          <div>
+            <div
+              style={{
+                fontSize: 11,
+                letterSpacing: 2,
+                textTransform: "uppercase",
+                color: "#888",
+                marginBottom: 8,
+              }}
+            >
+              Pants
+            </div>
 
-                    <div>
-                      <div
-                        style={{
-                          fontSize: 11,
-                          letterSpacing: 2,
-                          textTransform: "uppercase",
-                          color: "#888",
-                          marginBottom: 8,
-                        }}
-                      >
-                        Shoes
-                      </div>
+            <select
+              value={pants}
+              onChange={(e) => setPants(e.target.value)}
+              style={{ ...buttonStyle, borderRadius: 16, width: "100%" }}
+            >
+              {pantsOptions.map((v) => (
+                <option key={v} value={v}>
+                  {v}
+                </option>
+              ))}
+            </select>
+          </div>
 
-                      <select
-                        value={shoes}
-                        onChange={(e) => setShoes(e.target.value)}
-                        style={{ ...buttonStyle, borderRadius: 16, width: "100%" }}
-                      >
-                        {shoesOptions.map((v) => (
-                          <option key={v} value={v}>
-                            {v}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+          <div>
+            <div
+              style={{
+                fontSize: 11,
+                letterSpacing: 2,
+                textTransform: "uppercase",
+                color: "#888",
+                marginBottom: 8,
+              }}
+            >
+              Shoes
+            </div>
 
-                    <div>
-                      <div
-                        style={{
-                          fontSize: 11,
-                          letterSpacing: 2,
-                          textTransform: "uppercase",
-                          color: "#888",
-                          marginBottom: 8,
-                        }}
-                      >
-                        Necklace
-                      </div>
+            <select
+              value={shoes}
+              onChange={(e) => setShoes(e.target.value)}
+              style={{ ...buttonStyle, borderRadius: 16, width: "100%" }}
+            >
+              {shoesOptions.map((v) => (
+                <option key={v} value={v}>
+                  {v}
+                </option>
+              ))}
+            </select>
+          </div>
 
-                      <select
-                        value={necklace}
-                        onChange={(e) => setNecklace(e.target.value)}
-                        style={{ ...buttonStyle, borderRadius: 16, width: "100%" }}
-                      >
-                        {necklaceOptions.map((v) => (
-                          <option key={v} value={v}>
-                            {v}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+          <div>
+            <div
+              style={{
+                fontSize: 11,
+                letterSpacing: 2,
+                textTransform: "uppercase",
+                color: "#888",
+                marginBottom: 8,
+              }}
+            >
+              Necklace
+            </div>
 
-                    <div>
-                      <div
-                        style={{
-                          fontSize: 11,
-                          letterSpacing: 2,
-                          textTransform: "uppercase",
-                          color: "#888",
-                          marginBottom: 8,
-                        }}
-                      >
-                        Bracelet
-                      </div>
+            <select
+              value={necklace}
+              onChange={(e) => setNecklace(e.target.value)}
+              style={{ ...buttonStyle, borderRadius: 16, width: "100%" }}
+            >
+              {necklaceOptions.map((v) => (
+                <option key={v} value={v}>
+                  {v}
+                </option>
+              ))}
+            </select>
+          </div>
 
-                      <select
-                        value={bracelet}
-                        onChange={(e) => setBracelet(e.target.value)}
-                        style={{ ...buttonStyle, borderRadius: 16, width: "100%" }}
-                      >
-                        {braceletOptions.map((v) => (
-                          <option key={v} value={v}>
-                            {v}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+          <div>
+            <div
+              style={{
+                fontSize: 11,
+                letterSpacing: 2,
+                textTransform: "uppercase",
+                color: "#888",
+                marginBottom: 8,
+              }}
+            >
+              Bracelet
+            </div>
 
-                    <div>
-                      <div
-                        style={{
-                          fontSize: 11,
-                          letterSpacing: 2,
-                          textTransform: "uppercase",
-                          color: "#888",
-                          marginBottom: 8,
-                        }}
-                      >
-                        Ring
-                      </div>
+            <select
+              value={bracelet}
+              onChange={(e) => setBracelet(e.target.value)}
+              style={{ ...buttonStyle, borderRadius: 16, width: "100%" }}
+            >
+              {braceletOptions.map((v) => (
+                <option key={v} value={v}>
+                  {v}
+                </option>
+              ))}
+            </select>
+          </div>
 
-                      <select
-                        value={ring}
-                        onChange={(e) => setRing(e.target.value)}
-                        style={{ ...buttonStyle, borderRadius: 16, width: "100%" }}
-                      >
-                        {ringOptions.map((v) => (
-                          <option key={v} value={v}>
-                            {v}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+          <div>
+            <div
+              style={{
+                fontSize: 11,
+                letterSpacing: 2,
+                textTransform: "uppercase",
+                color: "#888",
+                marginBottom: 8,
+              }}
+            >
+              Ring
+            </div>
 
-                    <div>
-                      <div
-                        style={{
-                          fontSize: 11,
-                          letterSpacing: 2,
-                          textTransform: "uppercase",
-                          color: "#888",
-                          marginBottom: 8,
-                        }}
-                      >
-                        Earring
-                      </div>
+            <select
+              value={ring}
+              onChange={(e) => setRing(e.target.value)}
+              style={{ ...buttonStyle, borderRadius: 16, width: "100%" }}
+            >
+              {ringOptions.map((v) => (
+                <option key={v} value={v}>
+                  {v}
+                </option>
+              ))}
+            </select>
+          </div>
 
-                      <select
-                        value={earring}
-                        onChange={(e) => setEarring(e.target.value)}
-                        style={{ ...buttonStyle, borderRadius: 16, width: "100%" }}
-                      >
-                        {earringOptions.map((v) => (
-                          <option key={v} value={v}>
-                            {v}
-                          </option>
-                        ))}
-                      </select>
-                    </div>                 
+          <div>
+            <div
+              style={{
+                fontSize: 11,
+                letterSpacing: 2,
+                textTransform: "uppercase",
+                color: "#888",
+                marginBottom: 8,
+              }}
+            >
+              Earring
+            </div>
 
-                    <div>
-                      <div
-                        style={{
-                          fontSize: 11,
-                          letterSpacing: 2,
-                          textTransform: "uppercase",
-                          color: "#888",
-                          marginBottom: 8,
-                        }}
-                      >
-                        Occasion
-                      </div>
+            <select
+              value={earring}
+              onChange={(e) => setEarring(e.target.value)}
+              style={{ ...buttonStyle, borderRadius: 16, width: "100%" }}
+            >
+              {earringOptions.map((v) => (
+                <option key={v} value={v}>
+                  {v}
+                </option>
+              ))}
+            </select>
+          </div>
 
-                      <select
-                        value={occasion}
-                        onChange={(e) => setOccasion(e.target.value)}
-                        style={{ ...buttonStyle, borderRadius: 16, width: "100%" }}
-                      >
-                        {occasionOptions.map((v) => (
-                          <option key={v} value={v}>
-                            {v}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+          <div>
+            <div
+              style={{
+                fontSize: 11,
+                letterSpacing: 2,
+                textTransform: "uppercase",
+                color: "#888",
+                marginBottom: 8,
+              }}
+            >
+              Occasion
+            </div>
 
-                    {/* <div>
-                      <div
-                        style={{
-                          fontSize: 11,
-                          letterSpacing: 2,
-                          textTransform: "uppercase",
-                          color: "#888",
-                          marginBottom: 8,
-                        }}
-                      >
-                        Mood
-                      </div>
+            <select
+              value={occasion}
+              onChange={(e) => setOccasion(e.target.value)}
+              style={{ ...buttonStyle, borderRadius: 16, width: "100%" }}
+            >
+              {occasionOptions.map((v) => (
+                <option key={v} value={v}>
+                  {v}
+                </option>
+              ))}
+            </select>
+          </div>
+        </>
+      ) : (
+        <>
+          <ImageFilterButtons
+            title="Top"
+            value={top}
+            options={topImageOptions}
+            onChange={setTop}
+          />
 
-                      <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                        {moodOptions.map((item) => {
-                          const active = mood === item;
+          <ImageFilterButtons
+            title="Pants"
+            value={pants}
+            options={pantsImageOptions}
+            onChange={setPants}
+          />
 
-                          return (
-                            <button
-                              key={item}
-                              onClick={() => setMood(item)}
-                              style={{
-                                ...buttonStyle,
-                                background: active ? "white" : "#111111",
-                                color: active ? "black" : "white",
-                                borderColor: active ? "white" : "#3a3a3a",
-                              }}
-                            >
-                              {item}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div> */}
+          <ImageFilterButtons
+            title="Shoes"
+            value={shoes}
+            options={shoesImageOptions}
+            onChange={setShoes}
+          />
 
-                    <label style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 14 }}>
-                      <input
-                        type="checkbox"
-                        checked={signatureOnly}
-                        onChange={(e) => setSignatureOnly(e.target.checked)}
-                      />
-                      Signature fits only
-                    </label>
+          <ImageFilterButtons
+            title="Necklace"
+            value={necklace}
+            options={necklaceImageOptions}
+            onChange={setNecklace}
+          />
 
-                    <button
-                      onClick={resetFilters}
-                      style={{
-                        ...buttonStyle,
-                        width: "100%",
-                        borderRadius: 16,
-                        background: "#1a1a1a",
-                      }}
-                    >
-                      Reset all filters
-                    </button>
+          <ImageFilterButtons
+            title="Bracelet"
+            value={bracelet}
+            options={braceletImageOptions}
+            onChange={setBracelet}
+          />
 
-                    <button
-                      onClick={jumpToFilteredOutfits}
-                      style={{
-                        ...buttonStyle,
-                        width: "100%",
-                        borderRadius: 16,
-                        background: "white",
-                        color: "black",
-                        border: "none",
-                        fontWeight: 700,
-                      }}
-                    >
-                      Jump to filtered outfits
-                    </button>
-                  </div>
-                </div>
-              )}
+          <ImageFilterButtons
+            title="Ring"
+            value={ring}
+            options={ringImageOptions}
+            onChange={setRing}
+          />
+
+          <ImageFilterButtons
+            title="Earring"
+            value={earring}
+            options={earringImageOptions}
+            onChange={setEarring}
+          />
+
+          <TextFilterButtons
+            title="Occasion"
+            value={occasion}
+            options={occasionOptions}
+            onChange={setOccasion}
+          />
+        </>
+      )}
+
+      <label style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 14 }}>
+        <input
+          type="checkbox"
+          checked={signatureOnly}
+          onChange={(e) => setSignatureOnly(e.target.checked)}
+        />
+        ⭐ Signature fits only
+      </label>
+
+      <button
+        onClick={resetFilters}
+        style={{
+          ...buttonStyle,
+          width: "100%",
+          borderRadius: 16,
+          background: "#1a1a1a",
+        }}
+      >
+        Reset all filters
+      </button>
+
+      <button
+        onClick={jumpToFilteredOutfits}
+        style={{
+          ...buttonStyle,
+          width: "100%",
+          borderRadius: 16,
+          background: "#1a1a1a",
+          color: "white",
+          borderColor: "#3a3a3a",
+        }}
+      >
+        Jump to filtered outfits
+      </button>
+    </div>
+  </div>
+)}
 
               {!selected ? (
                 <div style={cardStyle}>
@@ -1325,7 +1661,7 @@ export default function App() {
                               color: "#ddd",
                             }}
                           >
-                            Signature
+                            ⭐ Signature
                           </span>
                         )}
 
@@ -1356,7 +1692,11 @@ export default function App() {
                         >
                           Top
                         </div>
-                        <ItemImageCard label={selected.top} imageUrl={selected.topImageUrl} />
+                        <ItemImageCard
+                          label={selected.top}
+                          imageUrl={selected.topImageUrl}
+                          category="tops"
+                        />
                       </div>
 
                       <div>
@@ -1370,8 +1710,12 @@ export default function App() {
                           }}
                         >
                           Pants
-                        </div>
-                        <ItemImageCard label={selected.pants} imageUrl={selected.pantsImageUrl} />
+                        </div>                        
+                        <ItemImageCard
+                          label={selected.pants}
+                          imageUrl={selected.pantsImageUrl}
+                          category="pants"
+                        />
                       </div>
 
                       <div>
@@ -1386,7 +1730,11 @@ export default function App() {
                         >
                           Shoes
                         </div>
-                        <ItemImageCard label={selected.shoes} imageUrl={selected.shoesImageUrl} />
+                        <ItemImageCard
+                        label={selected.shoes}
+                        imageUrl={selected.shoesImageUrl}
+                        category="shoes"
+                      />
                       </div>
                     </div>
 
@@ -1409,7 +1757,7 @@ export default function App() {
                         <div style={{ display: "grid", gap: 10 }}>
                           {selected.accessoryOptions.map((option) => (
                             <div key={option.id} style={{ ...cardStyle, padding: 12, background: "#000" }}>
-                              <div
+                              {/* <div
                                 style={{
                                   fontSize: 10,
                                   letterSpacing: 2,
@@ -1419,7 +1767,7 @@ export default function App() {
                                 }}
                               >
                                 Option {option.optionNumber}
-                              </div>
+                              </div> */}
 
                               {/* {option.originalLabel && (
                                 <div style={{ fontSize: 13, color: "#aaa", lineHeight: 1.4, marginBottom: 10 }}>
@@ -1445,7 +1793,7 @@ export default function App() {
 
                     <div ref={matchingOutfitsRef} style={{ marginTop: 16, scrollMarginTop: 96 }}>
                       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
-                      <div style={{ fontSize: 11, letterSpacing: 2, textTransform: "uppercase", color: "#888" }}>
+                      <div style={{ fontSize: 20, letterSpacing: 2, textTransform: "uppercase", color: "#888" }}>
                         Matching outfits
                       </div>
 
@@ -1454,9 +1802,9 @@ export default function App() {
 
                     <div style={{ display: "grid", gap: 10 }}>
                       {filtered.map((o) => {
-                        const active = selected.id === o.id;
-                        const pantsSwatch = getSwatch(o.pants);
-                        const shoesSwatch = getSwatch(o.shoes);
+                      const topSwatch = getSwatch(o.top);
+                      const pantsSwatch = getSwatch(o.pants);
+                      const shoesSwatch = getSwatch(o.shoes);
 
                         return (
                           <button
@@ -1465,9 +1813,9 @@ export default function App() {
                             style={{
                               ...cardStyle,
                               textAlign: "left",
-                              background: active ? "white" : "#111111",
-                              color: active ? "black" : "white",
-                              borderColor: active ? "white" : "#2a2a2a",
+                              background: topSwatch.bg,
+                              color: topSwatch.color,
+                              borderColor: topSwatch.border,
                               cursor: "pointer",
                             }}
                           >
@@ -1488,9 +1836,9 @@ export default function App() {
                                       padding: "4px 8px",
                                       borderRadius: 999,
                                       fontSize: 12,
-                                      background: active ? "#e5e5e5" : pantsSwatch.bg,
-                                      color: active ? "#111111" : pantsSwatch.color,
-                                      border: `1px solid ${active ? "#d1d1d1" : pantsSwatch.border}`,
+                                      background: pantsSwatch.bg,
+                                      color: pantsSwatch.color,
+                                      border: `1px solid ${pantsSwatch.border}`,
                                     }}
                                   >
                                     {o.pants}
@@ -1501,9 +1849,9 @@ export default function App() {
                                       padding: "4px 8px",
                                       borderRadius: 999,
                                       fontSize: 12,
-                                      background: active ? "#e5e5e5" : shoesSwatch.bg,
-                                      color: active ? "#111111" : shoesSwatch.color,
-                                      border: `1px solid ${active ? "#d1d1d1" : shoesSwatch.border}`,
+                                      background: shoesSwatch.bg,
+                                      color: shoesSwatch.color,
+                                      border: `1px solid ${shoesSwatch.border}`,
                                     }}
                                   >
                                     {o.shoes}
@@ -1513,25 +1861,48 @@ export default function App() {
                                 <OutfitImageStrip outfit={o} />
                               </div>
 
-                              {o.signature && (
-                                <span
-                                  style={{
-                                    background: active ? "black" : "#222",
-                                    color: "white",
-                                    borderRadius: 999,
-                                    padding: "6px 10px",
-                                    fontSize: 12,
-                                    whiteSpace: "nowrap",
-                                  }}
-                                >
-                                  Signature
-                                </span>
-                              )}
+                              <div
+                                style={{
+                                  display: "grid",
+                                  gap: 8,
+                                  justifyItems: "end",
+                                  alignContent: "start",
+                                  minWidth: 110,
+                                }}
+                              >
+                                {o.signature && (
+                                  <span
+                                    style={{
+                                      background: "#222",
+                                      color: "white",
+                                      borderRadius: 999,
+                                      padding: "6px 10px",
+                                      fontSize: 12,
+                                      whiteSpace: "nowrap",
+                                      fontWeight: 700,
+                                    }}
+                                  >
+                                    ⭐ Signature
+                                  </span>
+                                )}
+
+                              <span
+                                style={{
+                                  background: "#222",
+                                  color: "white",
+                                  borderRadius: 999,
+                                  padding: "6px 10px",
+                                  fontSize: 12,
+                                  whiteSpace: "nowrap",
+                                  fontWeight: 700,
+                                }}
+                              >
+                                {getOccasionGroup(o.occasion)}
+                              </span>
+                              </div>
                             </div>
 
-                            <div style={{ marginTop: 10, fontSize: 13, color: active ? "#555" : "#777" }}>
-                              {getOccasionGroup(o.occasion)}
-                            </div>
+
                           </button>
                         );
                       })}
@@ -1540,9 +1911,22 @@ export default function App() {
                 </>
               )}
             </>
-          ) : (
-            <div style={{ display: "grid", gap: 14 }}>
-              {wardrobeSections.map((section) => (
+            ) : (
+              <div style={{ display: "grid", gap: 14 }}>
+                <div
+                  style={{
+                    ...cardStyle,
+                    background: "#090909",
+                    color: "#aaa",
+                    fontSize: 14,
+                    lineHeight: 1.4,
+                    textAlign: "center",
+                  }}
+                >
+                  Click on an item to filter outfits
+                </div>
+
+                {wardrobeSections.map((section) => (
                 <SectionCard
                   key={section.key}
                   title={section.title}
