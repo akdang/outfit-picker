@@ -390,6 +390,85 @@ function getImageScale(category?: string | null, size: "large" | "tiny" = "large
   return 1;
 }
 
+function CompactAccessoryCard({
+  label,
+  imageUrl,
+}: {
+  label: string;
+  imageUrl: string | null;
+}) {
+  const [imageFailed, setImageFailed] = useState(false);
+
+  return (
+    <div
+      style={{
+        width: 62,
+        border: "1px solid #2a2a2a",
+        borderRadius: 10,
+        overflow: "hidden",
+        background: "#090909",
+        flexShrink: 0,
+      }}
+    >
+      <div
+        style={{
+          width: "100%",
+          height: 46,
+          background: "#fff",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: 3,
+          boxSizing: "border-box",
+          overflow: "hidden",
+        }}
+      >
+        {imageUrl && !imageFailed ? (
+          <img
+            src={imageUrl}
+            alt={label}
+            onError={() => setImageFailed(true)}
+            style={{
+              maxWidth: "100%",
+              maxHeight: "100%",
+              objectFit: "contain",
+              display: "block",
+            }}
+          />
+        ) : (
+          <div
+            style={{
+              color: "#111",
+              fontSize: 10,
+              fontWeight: 800,
+            }}
+          >
+            {label.slice(0, 1)}
+          </div>
+        )}
+      </div>
+
+      <div
+        style={{
+          padding: "4px 4px 5px",
+          fontSize: 9,
+          fontWeight: 800,
+          textAlign: "center",
+          color: "#eee",
+          lineHeight: 1.05,
+          minHeight: 26,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        {label}
+      </div>
+    </div>
+  );
+}
+
+
 function ItemImageCard({
   label,
   imageUrl,
@@ -1781,29 +1860,52 @@ const getImageFilterOptions = (category: string, optionValues: string[]) => {
                         <div style={{ color: "#777", fontSize: 14 }}>No accessories saved for this outfit.</div>
                       ) : (
                         <div style={{ display: "grid", gap: 10 }}>
+                          {selected.accessoryOptions.length === 0 ? (
+                        <div style={{ color: "#777", fontSize: 14 }}>No accessories saved for this outfit.</div>
+                      ) : (
+                        <div style={{ display: "grid", gap: 8 }}>
                           {selected.accessoryOptions.map((option) => (
-                            <div key={option.id} style={{ ...cardStyle, padding: 12, background: "#000" }}>
-                              {/* <div
+                            <div
+                                key={option.id}
+                                style={{
+                                  border: "1px solid #222",
+                                  borderRadius: 14,
+                                  background: "#000",
+                                  padding: 10,
+                                  width: "100%",
+                                  maxWidth: "100%",
+                                  boxSizing: "border-box",
+                                  overflow: "hidden",
+                                }}
+                              >
+                              <div
                                 style={{
                                   fontSize: 10,
                                   letterSpacing: 2,
                                   textTransform: "uppercase",
                                   color: "#666",
                                   marginBottom: 8,
+                                  whiteSpace: "nowrap",
                                 }}
                               >
                                 Option {option.optionNumber}
-                              </div> */}
+                              </div>
 
-                              {/* {option.originalLabel && (
-                                <div style={{ fontSize: 13, color: "#aaa", lineHeight: 1.4, marginBottom: 10 }}>
-                                  {option.originalLabel}
-                                </div>
-                              )} */}
-
-                              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 8 }}>
+                              <div
+                                style={{
+                                  display: "flex",
+                                  gap: 8,
+                                  overflowX: "auto",
+                                  overflowY: "hidden",
+                                  paddingBottom: 2,
+                                  width: "100%",
+                                  maxWidth: "100%",
+                                  boxSizing: "border-box",
+                                  WebkitOverflowScrolling: "touch",
+                                }}
+                              >
                                 {option.items.map((item) => (
-                                  <SmallItemImageCard
+                                  <CompactAccessoryCard
                                     key={item.id}
                                     label={item.name}
                                     imageUrl={getImageUrl(item.image_path)}
@@ -1812,6 +1914,8 @@ const getImageFilterOptions = (category: string, optionValues: string[]) => {
                               </div>
                             </div>
                           ))}
+                        </div>
+                      )}
                         </div>
                       )}
                     </div>
