@@ -662,21 +662,21 @@ export default function App() {
     return grouped;
   }, [wardrobeItems]);
 
-  const moodOptions = useMemo(() => {
-    const values = new Set<string>();
+  // const moodOptions = useMemo(() => {
+  //   const values = new Set<string>();
 
-    for (const item of baseMoods) {
-      if (item !== "All") values.add(item);
-    }
+  //   for (const item of baseMoods) {
+  //     if (item !== "All") values.add(item);
+  //   }
 
-    for (const outfit of outfits) {
-      for (const item of outfit.mood) {
-        if (item) values.add(item);
-      }
-    }
+  //   for (const outfit of outfits) {
+  //     for (const item of outfit.mood) {
+  //       if (item) values.add(item);
+  //     }
+  //   }
 
-    return ["All", ...Array.from(values)];
-  }, [outfits]);
+  //   return ["All", ...Array.from(values)];
+  // }, [outfits]);
 
   const jumpToFilteredOutfits = () => {
     matchingOutfitsRef.current?.scrollIntoView({
