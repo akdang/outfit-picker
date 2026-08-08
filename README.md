@@ -1,5 +1,6 @@
 # Start up guide
 npm install
+
 npm run dev
 
 # Tech stack
