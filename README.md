@@ -1,4 +1,18 @@
-<<<<<<< HEAD
+# Start up guide
+npm install
+npm run dev
+
+# Tech stack
+| Layer                   | Tech                                               |
+| ----------------------- | -------------------------------------------------- |
+| Frontend                | React                                              |
+| Language                | TypeScript                                         |
+| Build tool              | Vite                                               |
+| Backend / Database      | Supabase                                           |
+| Hosting                 | Vercel                                             |
+| Package/runtime tooling | Node.js + npm                                      |
+
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
@@ -72,6 +86,3 @@ export default defineConfig([
   },
 ])
 ```
-=======
-# outfit-picker
->>>>>>> 2fa6cf2d495f3ea3fb8d2cf42e40f86e2afa8edf
