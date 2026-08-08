@@ -1321,14 +1321,20 @@ const showNextAccessoryOption = () => {
             padding: 16,
             backdropFilter: "blur(10px)",
           }}
-        >
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-            <div>
-              <div style={{ fontSize: 11, letterSpacing: 2, textTransform: "uppercase", color: "#888" }}>
-                Mobile outfit app
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "flex-end",
+                justifyContent: "space-between",
+                gap: 12,
+              }}
+            >
+              <div>
+                <div style={{ fontSize: 28, fontWeight: 700, lineHeight: 1 }}>
+                  Paul&apos;s Outfit Picker
+                </div>
               </div>
-              <div style={{ fontSize: 28, fontWeight: 700, marginTop: 6 }}>Paul&apos;s Outfit Picker</div>
-            </div>
 
           {screen === "outfits" && (
           <div style={{ display: "grid", gap: 6, justifyItems: "center" }}>
@@ -1342,6 +1348,7 @@ const showNextAccessoryOption = () => {
               borderColor: "#3a3a3a",
               fontWeight: 600,
               minWidth: 96,
+              transform: "translateY(26px)",
             }}
           >
             🎲 Random
