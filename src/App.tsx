@@ -825,6 +825,8 @@ export default function App() {
 
   const [showBackToTop, setShowBackToTop] = useState(false);
 
+  const [accessoryOptionIndex, setAccessoryOptionIndex] = useState(0);
+
   const activeFilterCount = useMemo(() => {
     let count = 0;
 
@@ -1187,6 +1189,35 @@ const getImageFilterOptions = (category: string, optionValues: string[]) => {
   const selected = selectedId
     ? filtered.find((o) => o.id === selectedId) || filtered[0]
     : null;
+
+const selectedAccessoryOptions = selected?.accessoryOptions ?? [];
+
+const currentAccessoryOption =
+  selectedAccessoryOptions.length > 0
+    ? selectedAccessoryOptions[
+        Math.min(accessoryOptionIndex, selectedAccessoryOptions.length - 1)
+      ]
+    : null;
+
+useEffect(() => {
+  setAccessoryOptionIndex(0);
+}, [selected?.id]);
+
+const showPreviousAccessoryOption = () => {
+  if (!selectedAccessoryOptions.length) return;
+
+  setAccessoryOptionIndex((current) =>
+    current === 0 ? selectedAccessoryOptions.length - 1 : current - 1
+  );
+};
+
+const showNextAccessoryOption = () => {
+  if (!selectedAccessoryOptions.length) return;
+
+  setAccessoryOptionIndex((current) =>
+    current === selectedAccessoryOptions.length - 1 ? 0 : current + 1
+  );
+};    
 
   const selectMatchingOutfit = (id: string) => {
     setSelectedId(id);
@@ -1850,81 +1881,135 @@ const getImageFilterOptions = (category: string, optionValues: string[]) => {
                           letterSpacing: 2,
                           textTransform: "uppercase",
                           color: "#888",
-                          marginBottom: 12,
+                          marginBottom: 2,
                         }}
                       >
-                        Accessory options
+                        Accessory option {accessoryOptionIndex + 1} of {selectedAccessoryOptions.length}
+
                       </div>
 
-                      {selected.accessoryOptions.length === 0 ? (
-                        <div style={{ color: "#777", fontSize: 14 }}>No accessories saved for this outfit.</div>
+                      {selectedAccessoryOptions.length === 0 || !currentAccessoryOption ? (
+                        <div style={{ color: "#777", fontSize: 14 }}>
+                          No accessories saved for this outfit.
+                        </div>
                       ) : (
-                        <div style={{ display: "grid", gap: 10 }}>
-                          {selected.accessoryOptions.length === 0 ? (
-                        <div style={{ color: "#777", fontSize: 14 }}>No accessories saved for this outfit.</div>
-                      ) : (
-                        <div style={{ display: "grid", gap: 8 }}>
-                          {selected.accessoryOptions.map((option) => (
-                            <div
-                                key={option.id}
-                                style={{
-                                  border: "1px solid #222",
-                                  borderRadius: 14,
-                                  background: "#000",
-                                  padding: 10,
-                                  width: "100%",
-                                  maxWidth: "100%",
-                                  boxSizing: "border-box",
-                                  overflow: "hidden",
-                                }}
-                              >
-                              {/* <div
-                                style={{
-                                  fontSize: 10,
-                                  letterSpacing: 2,
-                                  textTransform: "uppercase",
-                                  color: "#666",
-                                  marginBottom: 8,
-                                  whiteSpace: "nowrap",
-                                }}
-                              >
-                                Option {option.optionNumber}
-                              </div> */}
+                        <div
+                          style={{
+                            display: "grid",
+                            gridTemplateColumns: "40px minmax(0, 1fr) 40px",
+                            gap: 10,
+                            alignItems: "center",
+                            width: "100%",
+                            boxSizing: "border-box",
+                          }}
+                        >
+                          <button
+                            onClick={showPreviousAccessoryOption}
+                            disabled={selectedAccessoryOptions.length <= 1}
+                            aria-label="Previous accessory option"
+                            style={{
+                              width: 38,
+                              height: 38,
+                              borderRadius: 999,
+                              border: "1px solid #333",
+                              background: selectedAccessoryOptions.length <= 1 ? "#111" : "#1a1a1a",
+                              color: selectedAccessoryOptions.length <= 1 ? "#444" : "white",
+                              cursor: selectedAccessoryOptions.length <= 1 ? "default" : "pointer",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              padding: 0,
+                            }}
+                          >
+                            <svg
+                              width="18"
+                              height="18"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <path d="M15 18l-6-6 6-6" />
+                            </svg>
+                          </button>
 
-                              <div
-                                style={{
-                                  display: "flex",
-                                  gap: 8,
-                                  overflowX: "auto",
-                                  overflowY: "hidden",
-                                  paddingBottom: 2,
-                                  width: "100%",
-                                  maxWidth: "100%",
-                                  boxSizing: "border-box",
-                                  WebkitOverflowScrolling: "touch",
-                                }}
-                              >
-                                {option.items.map((item) => (
-                                  <CompactAccessoryCard
-                                    key={item.id}
-                                    label={item.name}
-                                    imageUrl={getImageUrl(item.image_path)}
-                                  />
-                                ))}
-                              </div>
+                          <div
+                            style={{
+                              minWidth: 0,
+                              width: "100%",
+                              display: "grid",
+                              gap: 10,
+                            }}
+                          >
+
+
+                            <div
+                              style={{
+                                display: "flex",
+                                gap: 8,
+                                overflowX: "auto",
+                                overflowY: "hidden",
+                                paddingBottom: 2,
+                                width: "100%",
+                                maxWidth: "100%",
+                                boxSizing: "border-box",
+                                WebkitOverflowScrolling: "touch",
+                              }}
+                            >
+                              {currentAccessoryOption.items.map((item) => (
+                                <CompactAccessoryCard
+                                  key={item.id}
+                                  label={item.name}
+                                  imageUrl={getImageUrl(item.image_path)}
+                                />
+                              ))}
                             </div>
-                          ))}
+                          </div>
+
+                          <button
+                            onClick={showNextAccessoryOption}
+                            disabled={selectedAccessoryOptions.length <= 1}
+                            aria-label="Next accessory option"
+                            style={{
+                              width: 38,
+                              height: 38,
+                              borderRadius: 999,
+                              border: "1px solid #333",
+                              background: selectedAccessoryOptions.length <= 1 ? "#111" : "#1a1a1a",
+                              color: selectedAccessoryOptions.length <= 1 ? "#444" : "white",
+                              cursor: selectedAccessoryOptions.length <= 1 ? "default" : "pointer",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              padding: 0,
+                            }}
+                          >
+                            <svg
+                              width="18"
+                              height="18"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <path d="M9 18l6-6-6-6" />
+                            </svg>
+                          </button>
                         </div>
                       )}
-                        </div>
-                      )}
+
+
                     </div>
                   </div>
 
                     <div ref={matchingOutfitsRef} style={{ marginTop: 16, scrollMarginTop: 96 }}>
                       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
                       <div style={{ fontSize: 20, letterSpacing: 2, textTransform: "uppercase", color: "#888" }}>
-                        Matching outfits
+                        More outfits
                       </div>
 
                       <div style={{ fontSize: 12, color: "#777" }}>{filtered.length} found</div>
